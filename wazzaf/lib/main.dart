@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:wazzaf/core/class/page_name.dart';
 import 'package:wazzaf/core/class/pages.dart';
 
 void main() {

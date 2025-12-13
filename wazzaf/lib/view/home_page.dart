@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:wazzaf/controller/home_page.dart';
+import 'package:wazzaf/controller/my_home.dart';
 import 'package:wazzaf/core/class/text_style.dart';
 
 class MyHomePage extends StatelessWidget {
@@ -9,56 +9,62 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Get.find<HomePageController>();
-    return Scaffold(
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.transparent,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.40),
-              blurRadius: 13,
-              spreadRadius: 0.5,
-              offset: Offset(0, 0), // الظل للأعلى
+    return SafeArea(
+      child: Scaffold(
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.transparent,
+            boxShadow: [
+              BoxShadow(
+                // ignore: deprecated_member_use
+                color: Colors.black.withOpacity(0.40),
+                blurRadius: 13,
+                spreadRadius: 0.5,
+                offset: Offset(0, 0), // shadow direction
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(12),
+              topRight: Radius.circular(12),
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(12),
-            topRight: Radius.circular(12),
-          ),
-          child: GetBuilder<HomePageController>(
-            builder: (controller) {
-              return BottomAppBar(
-                // color: Colors.black,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    textDirection: TextDirection.rtl,
-                    children: [
-                      ...List.generate(
-                        5,
-                        (index) => _BottomItem(
-                          controller.pages[index].icon,
-                          controller.pages[index].title,
-                          () {
-                            controller.changePage(index);
-                          },
+            child: GetBuilder<HomePageController>(
+              builder: (controller) {
+                return BottomAppBar(
+                  // color: Colors.black,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      textDirection: TextDirection.rtl,
+                      children: [
+                        ...List.generate(
+                          5,
+                          (index) => _BottomItem(
+                            controller.pages[index].icon,
+                            controller.pages[index].title,
+                            () {
+                              controller.changePage(index);
+                            },
 
-                          controller.isSelected == index ? true : false,
+                            controller.isSelected == index ? true : false,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
+        ),
+
+        body: GetBuilder<HomePageController>(
+          builder: (controller) =>
+              controller.pages.elementAt(controller.isSelected).widget,
         ),
       ),
-
-      body: Column(children: [Text("data")]),
     );
   }
 }
