@@ -15,21 +15,53 @@ class HomeControllerImp extends HomeController {
   String address = "syria damascus";
   List<CategoryAndItemModel> categories = [];
   StatuesRequest statuesRequest = StatuesRequest.none;
+  // @override
+  // fetchData() async {
+  //   statuesRequest = StatuesRequest.loading;
+
+  //   update();
+
+  //   var response = await homeData.fetchData();
+  //   if (response is Map) {
+  //     if (response['status'] == 'success') {
+  //       for (var element in response['data']) {
+  //         categories.add(CategoryAndItemModel.fromJson(element));
+  //       }
+  //       statuesRequest = StatuesRequest.success;
+  //     }
+  //   } else {
+  //     statuesRequest = response;
+  //   }
+
+  //   update();
+  // }
+
   @override
-  fetchData() async {
+  Future<void> fetchData() async {
     statuesRequest = StatuesRequest.loading;
     update();
 
-    var response = await homeData.fetchData();
+    final response = await homeData.fetchData();
 
-    if (response['status'] == 'success') {
-      for (var element in response['data']) {
-        categories.add(CategoryAndItemModel.fromJson(element));
-      }
-      statuesRequest = StatuesRequest.success;
-    } else {
-      statuesRequest = StatuesRequest.noData;
-    }
+    response.fold(
+      (data) {
+        if (data['status'] == 'success') {
+          categories.clear();
+
+          for (var element in data['data']) {
+            categories.add(CategoryAndItemModel.fromJson(element));
+          }
+
+          statuesRequest = StatuesRequest.success;
+        } else {
+          statuesRequest = StatuesRequest.noData;
+        }
+      },
+      (status) {
+        statuesRequest = status;
+      },
+    );
+
     update();
   }
 

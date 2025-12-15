@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:wazzaf/controller/home_controller.dart';
-import 'package:wazzaf/core/class/statues_request.dart';
 import 'package:wazzaf/core/class/text_style.dart';
 import 'package:wazzaf/core/customs/custom_text_field.dart';
 import 'package:wazzaf/core/model/category.dart';
+
+import '../../core/class/handling_data_view.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -18,22 +19,27 @@ class HomePage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         // crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          RowAddress(con: con),
-          CustomTextField(hint: 'ابحث عن الخدمة'),
+          RowAddress(con: con), // show address
+          CustomTextField(hint: 'ابحث عن الخدمة'), // search about service
           Container(height: 150, color: Colors.red),
           Text("ما نوع الخدمة التي تريدها اليوم", style: AppTextStyle.bold),
           const SizedBox(height: 10),
           GetBuilder<HomeControllerImp>(
             builder: (controller) => HandlingDataView(
+              //--------- show list of services
               status: con.statuesRequest,
-              widget: RowServes(categories: con.categories),
+              child: RowServes(categories: con.categories),
             ),
           ),
           Text("الأقسام", style: AppTextStyle.bold),
-          Expanded(
-            child: Container(
-              // color: Colors.red,
-              child: ShowCategoryAndItem(categories: con.categories),
+
+          GetBuilder<HomeControllerImp>(
+            //--------- show list of categories with items
+            builder: (controller) => HandlingDataView(
+              status: con.statuesRequest,
+              child: Expanded(
+                child: ShowCategoryAndItem(categories: con.categories),
+              ),
             ),
           ),
         ],
@@ -42,6 +48,7 @@ class HomePage extends StatelessWidget {
   }
 }
 
+// show category and item in grid
 class ShowCategoryAndItem extends StatelessWidget {
   final List<CategoryAndItemModel> categories;
   const ShowCategoryAndItem({super.key, required this.categories});
@@ -56,34 +63,51 @@ class ShowCategoryAndItem extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(
-              category.category!,
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+            Text(category.category!, style: AppTextStyle.middleBold),
+
+            const SizedBox(height: 8),
+
+            Directionality(
+              textDirection: TextDirection.rtl,
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: category.item!.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.7,
+                ),
+                itemBuilder: (context, gridIndex) {
+                  final item = category.item![gridIndex];
+
+                  return Card(
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Container(
+                            height: 10,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade200,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                        Text(item.itemName!, style: AppTextStyle.light),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
-            Text("data"),
-            // GridView.builder(
-            //   physics: NeverScrollableScrollPhysics(),
-            //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //     crossAxisCount: 2,
-            //   ),
-            //   shrinkWrap: true,
-            //   itemBuilder: (context, index) => Column(children: [Text('data')]),
-            // ),
           ],
         );
       },
     );
   }
 }
-
-//  ListView.builder(
-//               shrinkWrap: true,
-//               physics: NeverScrollableScrollPhysics(),
-//               itemCount: category.item!.length,
-//               itemBuilder: (context, i) {
-//                 return Text("- ${category.item![i].itemName}");
-//               },
-//             ),
 
 class RowServes extends StatelessWidget {
   final List<CategoryAndItemModel> categories;
@@ -152,41 +176,41 @@ class RowAddress extends StatelessWidget {
   }
 }
 
-class HandlingDataView extends StatelessWidget {
-  final StatuesRequest status;
-  final Widget widget;
+// class HandlingDataView extends StatelessWidget {
+//   final StatuesRequest status;
+//   final Widget widget;
 
-  const HandlingDataView({
-    super.key,
-    required this.status,
-    required this.widget,
-  });
+//   const HandlingDataView({
+//     super.key,
+//     required this.status,
+//     required this.widget,
+//   });
 
-  @override
-  @override
-  Widget build(BuildContext context) {
-    switch (status) {
-      case StatuesRequest.loading:
-        return const Center(child: CircularProgressIndicator());
+//   @override
+//   @override
+//   Widget build(BuildContext context) {
+//     switch (status) {
+//       case StatuesRequest.loading:
+//         return const Center(child: CircularProgressIndicator());
 
-      case StatuesRequest.success:
-        return widget;
+//       case StatuesRequest.success:
+//         return widget;
 
-      case StatuesRequest.noData:
-        return const Center(child: Text("لا توجد بيانات"));
+//       case StatuesRequest.noData:
+//         return const Center(child: Text("لا توجد بيانات"));
 
-      case StatuesRequest.noInternet:
-        return const Center(child: Text("لا يوجد اتصال بالإنترنت"));
+//       case StatuesRequest.noInternet:
+//         return const Center(child: Text("لا يوجد اتصال بالإنترنت"));
 
-      case StatuesRequest.noToken:
-        return const Center(child: Text("يرجى تسجيل الدخول"));
+//       case StatuesRequest.noToken:
+//         return const Center(child: Text("يرجى تسجيل الدخول"));
 
-      case StatuesRequest.error:
-      case StatuesRequest.failure:
-        return const Center(child: Text("حدث خطأ ما، حاول لاحقًا"));
+//       case StatuesRequest.error:
+//       case StatuesRequest.failure:
+//         return const Center(child: Text("حدث خطأ ما، حاول لاحقًا"));
 
-      case StatuesRequest.none: // 🔥 مهم جدًا
-        return const SizedBox.shrink();
-    }
-  }
-}
+//       case StatuesRequest.none: // 🔥 مهم جدًا
+//         return const SizedBox.shrink();
+//     }
+//   }
+// }

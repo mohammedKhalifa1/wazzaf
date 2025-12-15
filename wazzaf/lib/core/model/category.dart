@@ -13,15 +13,6 @@ class CategoryAndItemModel {
       });
     }
   }
-
-  // Map<String, dynamic> toJson() {
-  //   final Map<String, dynamic> data = new Map<String, dynamic>();
-  //   data['category'] = this.category;
-  //   if (this.item != null) {
-  //     data['item'] = this.item!.map((v) => v.toJson()).toList();
-  //   }
-  //   return data;
-  // }
 }
 
 class Item {
@@ -38,13 +29,4 @@ class Item {
     itemName = json['item_name'];
     itemCategory = json['item_category'];
   }
-
-  // Map<String, dynamic> toJson() {
-  //   final Map<String, dynamic> data = new Map<String, dynamic>();
-  //   data['item_id'] = this.itemId;
-  //   data['item_image'] = this.itemImage;
-  //   data['item_name'] = this.itemName;
-  //   data['item_category'] = this.itemCategory;
-  //   return data;
-  // }
 }
